@@ -18,7 +18,7 @@ const Home: React.FC = (): JSX.Element => {
   };
 
   React.useEffect((): void => {
-    const stored_rooms_string = localStorage.getItem(GUFTGOO_ROOMS) || "{}";
+    const stored_rooms_string = localStorage.getItem(GUFTGOO_ROOMS) || "[]";
     const stored_rooms = JSON.parse(stored_rooms_string);
     setStoredRooms(stored_rooms);
     setViewHeight();
