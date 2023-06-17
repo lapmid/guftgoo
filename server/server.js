@@ -7,14 +7,17 @@ const { generateMessage, generateLocationMessage } = require("./utils/message");
 const { isRealString } = require("./utils/validation");
 const { Users } = require("./utils/users");
 
-const publicPath = path.join(__dirname, "../public");
+const publicPath = path.join(__dirname, "./public");
 const port = process.env.PORT || 8080;
 
 var cors = require("cors");
-const { unwatchFile } = require("fs");
+// const { unwatchFile } = require("fs");
 var app = express();
 var server = http.createServer(app);
-var io = socketIO(server, { cors: { origin: "*" } });
+var io = socketIO(server, {
+  maxHttpBufferSize: 5 * 1e6,
+  cors: { origin: "*" },
+});
 var users = new Users();
 
 app.use(express.static(publicPath));
@@ -39,29 +42,39 @@ io.on("connection", (socket) => {
     users.addUser(socket.id, params.name, params.room);
 
     io.to(params.room).emit("updateUserList", users.getUserList(params.room));
-    socket.emit(
+    // socket.emit(
+    //   "newMessage",
+    //   generateMessage(
+    //     { name: "Admin", room: params.room },
+    //     "Welcome to the chat app"
+    //   )
+    // );
+    // socket.broadcast
+    io.to(params.room).emit(
       "newMessage",
       generateMessage(
-        { name: "Admin", room: params.room },
-        "Welcome to the chat app"
+        { name: "Admin", room: params.room, id: "Admin" },
+        `${params.name} has joined`,
+        "Text"
       )
     );
-    socket.broadcast
-      .to(params.room)
-      .emit(
-        "newMessage",
-        generateMessage(
-          { name: "Admin", room: params.room, id: "Admin" },
-          `${params.name} has joined.`
-        )
-      );
   });
 
   socket.on("createMessage", (message) => {
     var user = users.getUser(socket.id);
     console.log(message, user);
     if (user && isRealString(message.text)) {
-      io.to(user.room).emit("newMessage", generateMessage(user, message.text));
+      io.to(user.room).emit(
+        "newMessage",
+        generateMessage(user, message.text, "Text")
+      );
+    }
+  });
+  socket.on("fileUpload", (file, callback) => {
+    var user = users.getUser(socket.id);
+    callback(true);
+    if (user) {
+      io.to(user.room).emit("newMessage", generateMessage(user, file, "File"));
     }
   });
 
@@ -81,8 +94,8 @@ io.on("connection", (socket) => {
   });
 });
 
-app.get("/test", (req, res) => {
-  res.send("Hello");
+app.get("*", (req, res) => {
+  res.sendFile(path.join(publicPath, "index.html"));
 });
 server.listen(port, () => {
   console.log(`Server is up on ${port}`);
