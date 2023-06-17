@@ -8,7 +8,6 @@ const Home: React.FC = (): JSX.Element => {
   const [name, setName] = React.useState<string>("");
   const [room, setRoom] = React.useState<string>("");
   const [storedRooms, setStoredRooms] = React.useState<User[]>([]);
-
   const navigate = useNavigate();
   const onJoin = (e: React.MouseEvent<HTMLButtonElement> | undefined): void => {
     if (name && room) {
@@ -56,7 +55,10 @@ const Home: React.FC = (): JSX.Element => {
                 placeholder="Secret room name"
                 value={room}
                 onChange={(e): void => {
-                  setRoom(e.currentTarget.value);
+                  if (e.currentTarget.value.includes(" ")) {
+                  } else {
+                    setRoom(e.currentTarget.value);
+                  }
                 }}
               />
             </div>

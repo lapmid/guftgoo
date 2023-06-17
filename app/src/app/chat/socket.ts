@@ -1,6 +1,7 @@
 import { Socket, io } from "socket.io-client";
 
 export const GUFTGOO_ROOMS = "GUFTGOO_ROOMS";
+const SOCKET_SERVER = "http://192.168.1.6:8080";
 
 export interface User {
   name: string;
@@ -26,7 +27,7 @@ export const initSocket = async (
   updateUserList: (data: User[]) => void
 ): Promise<void> => {
   console.log("socket client connect");
-  socket.current = io("http://192.168.1.6:8080");
+  socket.current = io();
 
   socket.current.on("joined", (data) => {
     onJoin(data);
