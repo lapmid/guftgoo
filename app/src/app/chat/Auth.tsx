@@ -17,9 +17,10 @@ export const AuthPage: React.FC<AuthPageProps> = (props): JSX.Element => {
   const handleLogin = (): void => {
     setProcessing(true);
     if (username && password && password.length > 5) {
-      // console.log("login", AUTH_SERVER);
+      const endpoint = window.location.origin + "/auth/login";
+      console.log("login", AUTH_SERVER);
       const creds = { username, password };
-      fetch(AUTH_SERVER + "/auth/login", {
+      fetch(endpoint, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -57,8 +58,9 @@ export const AuthPage: React.FC<AuthPageProps> = (props): JSX.Element => {
   const handleRegister = (): void => {
     setProcessing(true);
     if (username && password && password.length > 5) {
+      const endpoint = window.location.origin + "/auth/register";
       const creds = { username, password };
-      fetch(AUTH_SERVER + "/auth/register", {
+      fetch(endpoint, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
