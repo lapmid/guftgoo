@@ -2,7 +2,6 @@ import { Socket, io } from "socket.io-client";
 
 export const GUFTGOO_ROOMS = "GUFTGOO_ROOMS";
 export const SOCKET_SERVER = undefined;
-export const AUTH_SERVER = "https://guftgu.onrender.com";
 
 export interface User {
   userId: string;

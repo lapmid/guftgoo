@@ -3,7 +3,6 @@ import Cookies from "js-cookie";
 import Modal from "react-modal";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import "react-tabs/style/react-tabs.css";
-import { AUTH_SERVER } from "./socket";
 
 interface AuthPageProps {
   isOpen: boolean;
