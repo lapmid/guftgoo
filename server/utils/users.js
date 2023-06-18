@@ -14,6 +14,10 @@ class Users {
     }
     return user;
   }
+  getCount(room) {
+    return Object.values(this.users).filter((user) => user.room === room)
+      .length;
+  }
   getUser(id) {
     return this.users[id];
   }

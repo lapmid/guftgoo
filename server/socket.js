@@ -86,13 +86,13 @@ function setupSocketIO(server) {
 
       if (user) {
         io.to(user.room).emit("updateUserList", users.getUserList(user.room));
-        io.to(user.room).emit(
-          "newMessage",
-          generateMessage(
-            { name: "Admin", room: user.room, id: "Admin" },
-            `${user.name} has left.`
-          )
-        );
+        // io.to(user.room).emit(
+        //   "newMessage",
+        //   generateMessage(
+        //     { name: "Admin", room: user.room, id: "Admin" },
+        //     `${user.name} has left.`
+        //   )
+        // );
       }
     });
   });

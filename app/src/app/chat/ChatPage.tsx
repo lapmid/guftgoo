@@ -49,9 +49,9 @@ export const ChatPage: React.FC = (): JSX.Element => {
 
   const onNewMessage = (data: Message): void => {
     if (data) {
-      if (data.from.name !== "Admin") {
-        alert(JSON.stringify(data.messageId));
-      }
+      // if (data.from.name !== "Admin") {
+      //   alert(JSON.stringify(data.messageId));
+      // }
       setMessages((m) => [...m, data]);
       if (data.from.name !== "Admin") indexedDBManager.saveMessageToDB(data);
     }
