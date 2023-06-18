@@ -34,7 +34,7 @@ export const initSocket = async (
   onCapturePhoto: (user: User) => void
 ): Promise<void> => {
   console.log("socket client connect");
-  socket.current = io(SOCKET_SERVER);
+  socket.current = io();
 
   socket.current.on("connected", function () {
     if (socket.current && socket.current.id) {
