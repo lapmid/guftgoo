@@ -1,7 +1,8 @@
 import { Socket, io } from "socket.io-client";
 
 export const GUFTGOO_ROOMS = "GUFTGOO_ROOMS";
-export const SOCKET_SERVER = "http://192.168.1.6:8080";
+export const SOCKET_SERVER = process.env.SOCKET_SERVER;
+export const AUTH_SERVER = process.env.AUTH_SERVER;
 
 export interface User {
   userId: string;

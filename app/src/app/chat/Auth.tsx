@@ -3,7 +3,7 @@ import Cookies from "js-cookie";
 import Modal from "react-modal";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import "react-tabs/style/react-tabs.css";
-import { SOCKET_SERVER } from "./socket";
+import { AUTH_SERVER } from "./socket";
 
 interface AuthPageProps {
   isOpen: boolean;
@@ -19,7 +19,7 @@ export const AuthPage: React.FC<AuthPageProps> = (props): JSX.Element => {
     if (username && password && password.length > 5) {
       console.log("login");
       const creds = { username, password };
-      fetch(SOCKET_SERVER + "/auth/login", {
+      fetch(AUTH_SERVER + "/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -58,7 +58,7 @@ export const AuthPage: React.FC<AuthPageProps> = (props): JSX.Element => {
     setProcessing(true);
     if (username && password && password.length > 5) {
       const creds = { username, password };
-      fetch(SOCKET_SERVER + "/auth/register", {
+      fetch(AUTH_SERVER + "/auth/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
