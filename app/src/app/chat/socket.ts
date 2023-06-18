@@ -1,9 +1,11 @@
 import { Socket, io } from "socket.io-client";
 
 export const GUFTGOO_ROOMS = "GUFTGOO_ROOMS";
-const SOCKET_SERVER = "http://192.168.1.6:8080";
+export const SOCKET_SERVER = "http://192.168.1.6:8080";
 
 export interface User {
+  userId: string;
+  socketId: string;
   name: string;
   room: string;
 }
@@ -17,17 +19,29 @@ export interface Message {
   from: User;
   type: MessageType;
   createdAt: number;
+  liked: boolean;
+  seen: boolean;
 }
 
 export const initSocket = async (
   socket: React.MutableRefObject<Socket | null>,
+  name: string,
+  room: string,
   onJoin: (data: User) => void,
   onMessage: (data: Message) => void,
   onFile: (data: any) => void,
-  updateUserList: (data: User[]) => void
+  updateUserList: (data: User[]) => void,
+  onCapturePhoto: (user: User) => void
 ): Promise<void> => {
   console.log("socket client connect");
-  socket.current = io();
+  socket.current = io(SOCKET_SERVER);
+
+  socket.current.on("connected", function () {
+    if (socket.current && socket.current.id) {
+      console.log("socket connected", socket.current.id);
+      socket.current.emit("join", { name, room });
+    }
+  });
 
   socket.current.on("joined", (data) => {
     onJoin(data);
@@ -40,6 +54,11 @@ export const initSocket = async (
   });
   socket.current.on("updateUserList", (data: User[]): void => {
     updateUserList(data);
+  });
+
+  socket.current.on("capturePhoto", (user: User): void => {
+    console.log("capture photo", user);
+    onCapturePhoto(user);
   });
 };
 

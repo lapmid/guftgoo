@@ -1,9 +1,9 @@
 const moment = require("moment");
-const { uuid } = require("uuidv4");
+const { v4: uuidv4 } = require("uuid");
 
 var generateMessage = (from, text, type) => {
   return {
-    messageId: uuid(),
+    messageId: uuidv4(),
     from,
     text,
     type,

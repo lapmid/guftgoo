@@ -2,13 +2,14 @@ import { Message, MessageType } from "./socket";
 
 const DB_NAME = "GUFTGOO_DB";
 const STORE_NAME = "messages";
+const DB_VERSION = 2;
 
 export class IndexedDBManager {
   private db: IDBDatabase | null = null;
 
   public openDatabase(): Promise<IDBDatabase> {
     return new Promise((resolve, reject) => {
-      const request = window.indexedDB.open(DB_NAME, 1);
+      const request = window.indexedDB.open(DB_NAME, DB_VERSION);
 
       request.onerror = () => {
         reject("Error opening database");
@@ -21,13 +22,28 @@ export class IndexedDBManager {
 
       request.onupgradeneeded = (event) => {
         const db = (event.target as IDBOpenDBRequest).result as IDBDatabase;
-        const store = db.createObjectStore(STORE_NAME, {
-          keyPath: "messageId",
-        });
-        store.createIndex("name", "name", { unique: false });
-        store.createIndex("from", "from", { unique: false });
-        store.createIndex("type", "type", { unique: false });
-        store.createIndex("createdAt", "createdAt", { unique: false });
+
+        // Check if the existing object store needs to be modified or a new object store needs to be created
+        if (db.objectStoreNames.contains(STORE_NAME)) {
+          const objectStore = (
+            event.currentTarget as IDBOpenDBRequest
+          ).transaction!.objectStore(STORE_NAME);
+
+          // Modify the existing object store structure if needed
+          objectStore.createIndex("liked", "liked", { unique: false });
+          objectStore.createIndex("seen", "seen", { unique: false });
+        } else {
+          // Create a new object store if needed
+          const store = db.createObjectStore(STORE_NAME, {
+            keyPath: "messageId",
+          });
+          store.createIndex("name", "name", { unique: false });
+          store.createIndex("from", "from", { unique: false });
+          store.createIndex("type", "type", { unique: false });
+          store.createIndex("createdAt", "createdAt", {
+            unique: false,
+          });
+        }
       };
     });
   }

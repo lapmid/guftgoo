@@ -2,9 +2,9 @@ class Users {
   constructor() {
     this.users = {};
   }
-  addUser(id, name, room) {
-    var user = { id, name, room };
-    this.users[id] = user;
+  addUser(userId, socketId, name, room) {
+    var user = { userId, socketId, name, room };
+    this.users[userId] = user;
     return user;
   }
   removeUser(id) {
@@ -27,17 +27,3 @@ class Users {
 }
 
 module.exports = { Users };
-
-// class Person {
-//   constructor (name, age) {
-//     this.name = name;
-//     this.age = age;
-//   }
-//   getUserDescription () {
-//     return `${this.name} is ${this.age} year(s) old.`;
-//   }
-// }
-//
-// var me = new Person('Andrew', 25);
-// var description = me.getUserDescription();
-// console.log(description);

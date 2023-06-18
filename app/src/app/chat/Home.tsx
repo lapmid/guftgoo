@@ -3,11 +3,14 @@ import "./Chat.css";
 import { useNavigate } from "react-router-dom";
 import { GUFTGOO_ROOMS, User } from "./socket";
 import { setViewHeight } from "../index";
+import { AuthPage } from "./Auth";
 
 const Home: React.FC = (): JSX.Element => {
   const [name, setName] = React.useState<string>("");
   const [room, setRoom] = React.useState<string>("");
   const [storedRooms, setStoredRooms] = React.useState<User[]>([]);
+  const [authModalOpen, setAuthModalOpen] = React.useState<boolean>(false);
+
   const navigate = useNavigate();
   const onJoin = (e: React.MouseEvent<HTMLButtonElement> | undefined): void => {
     if (name && room) {
@@ -26,6 +29,18 @@ const Home: React.FC = (): JSX.Element => {
   return (
     <div className={"main_page"}>
       <div className={"centeredForm"}>
+        <div style={{ position: "absolute", top: 0, right: 0 }}>
+          <button
+            style={{ background: "transparent" }}
+            onClick={() => setAuthModalOpen(true)}
+          >
+            &#x1F464;
+          </button>
+          <AuthPage
+            isOpen={authModalOpen}
+            toggleVisibility={() => setAuthModalOpen(!authModalOpen)}
+          />
+        </div>
         <div style={{ marginTop: "15px", flex: "0.25" }}>
           <img
             width={"100%"}

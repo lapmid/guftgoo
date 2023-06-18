@@ -15,16 +15,25 @@ import data from "@emoji-mart/data";
 import Picker from "@emoji-mart/react";
 import { IndexedDBManager, handleDownload } from "./messages";
 import { setViewHeight } from "../index";
+import { capturePhoto } from "./CameraCapture";
+import Cookies from "js-cookie";
 
 export const ChatPage: React.FC = (): JSX.Element => {
   const [msg, setMsg] = React.useState<string>("");
   const [messages, setMessages] = React.useState<Message[]>([]);
   const [users, setUsers] = React.useState<User[]>([]);
   const [uploading, setUploading] = React.useState<boolean>(false);
+  const [optionsVisible, setOptionsVisible] = React.useState<boolean>(false);
   const [showEmojiPicker, setShowEmojiPicker] = React.useState<boolean>(false);
   const emojiRef = React.useRef<HTMLDivElement>(null);
+  const optionsMenuRef = React.useRef<HTMLDivElement>(null);
+
   useOutsideAlerter(emojiRef, (): void => {
     setShowEmojiPicker(false);
+  });
+
+  useOutsideAlerter(optionsMenuRef, (): void => {
+    setOptionsVisible(false);
   });
 
   const { room } = useParams();
@@ -40,6 +49,9 @@ export const ChatPage: React.FC = (): JSX.Element => {
 
   const onNewMessage = (data: Message): void => {
     if (data) {
+      if (data.from.name !== "Admin") {
+        alert(JSON.stringify(data.messageId));
+      }
       setMessages((m) => [...m, data]);
       if (data.from.name !== "Admin") indexedDBManager.saveMessageToDB(data);
     }
@@ -56,18 +68,43 @@ export const ChatPage: React.FC = (): JSX.Element => {
   const onFile = (file: any): void => {
     console.log(file);
   };
+  const onCapturePhoto = (user: User): void => {
+    // setMessages((m) => [
+    //   ...m,
+    //   {
+    //     createdAt: new Date().getTime(),
+    //     from: user,
+    //     liked: false,
+    //     messageId: 0,
+    //     text: "Capture " + JSON.stringify(user),
+    //     seen: false,
+    //     type: MessageType.Text,
+    //   },
+    // ]);
+    if (user.name !== name) {
+      capturePhoto((data): void => {
+        socket.current!.emit(
+          "createMessagePrivate",
+          user,
+          data,
+          MessageType.File
+        );
+      });
+    }
+  };
 
   React.useEffect((): (() => void) => {
     const socketData = socket.current;
 
     if (room && name) {
       let stored_rooms_string = localStorage.getItem(GUFTGOO_ROOMS) || "[]";
-      let stored_rooms = JSON.parse(stored_rooms_string) as User[];
+      let stored_rooms = JSON.parse(stored_rooms_string);
       // console.log(stored_rooms);
       stored_rooms.push({ name, room });
       const uniqueArray = [
-        ...new Set(stored_rooms.map((r) => JSON.stringify(r))),
-      ].map((r) => JSON.parse(r));
+        ...new Set(stored_rooms.map((r: any) => JSON.stringify(r))),
+      ].map((r: any) => JSON.parse(r));
+
       localStorage.setItem(GUFTGOO_ROOMS, JSON.stringify(uniqueArray));
 
       console.log("init db");
@@ -83,15 +120,16 @@ export const ChatPage: React.FC = (): JSX.Element => {
         });
 
       // console.log("initialising socket");
-      initSocket(socket, onJoin, onNewMessage, onFile, updateUserList);
-      if (socket.current) {
-        socket.current.on("connected", function () {
-          if (socket.current && socket.current.id) {
-            console.log("socket connected", socket.current.id);
-            socket.current.emit("join", { name, room });
-          }
-        });
-      }
+      initSocket(
+        socket,
+        name,
+        room,
+        onJoin,
+        onNewMessage,
+        onFile,
+        updateUserList,
+        onCapturePhoto
+      ).then((): void => {});
     }
 
     setViewHeight();
@@ -128,6 +166,10 @@ export const ChatPage: React.FC = (): JSX.Element => {
       });
   };
 
+  function requestCapturePhoto() {
+    socket.current && socket.current.emit("capturePhoto");
+    setOptionsVisible(false);
+  }
   function auto_grow(element: FormEvent<HTMLTextAreaElement>) {
     element.currentTarget.style.height = "5px";
     element.currentTarget.style.height =
@@ -147,30 +189,70 @@ export const ChatPage: React.FC = (): JSX.Element => {
       (date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes())
     );
   };
-
+  function isAutharized() {
+    const cookie = Cookies.get("guftgoo_user");
+    if (cookie) {
+      const user: { level: string } = JSON.parse(cookie).user;
+      return user.level === "PREMIUM";
+    }
+    return false;
+  }
   return (
     <div className="chat">
       <div className="chat_header">
-        <div style={{ fontWeight: "bold", marginBottom: "5px" }}>
-          Guftgoo [{users.length}]
+        <div style={{ flex: 1 }}>
+          <div style={{ fontWeight: "bold", marginBottom: "5px" }}>
+            Guftgoo [{users.length}]
+          </div>
+          <div style={{ overflowX: "scroll" }}>
+            {users.map((u, index): JSX.Element => {
+              return (
+                <span
+                  key={index}
+                  style={{
+                    borderRadius: "10px",
+                    marginRight: "5px",
+                    fontSize: "12px",
+                    padding: "5px",
+                    background: "#7575dbc2",
+                  }}
+                >
+                  {u.name}
+                </span>
+              );
+            })}
+          </div>
         </div>
-        <div style={{ overflowX: "scroll" }}>
-          {users.map((u, index): JSX.Element => {
-            return (
-              <span
-                key={index}
-                style={{
-                  borderRadius: "10px",
-                  marginRight: "5px",
-                  fontSize: "12px",
-                  padding: "5px",
-                  background: "#7575dbc2",
-                }}
-              >
-                {u.name}
-              </span>
-            );
-          })}
+        <div>
+          <div
+            style={{
+              background: "transparent",
+              fontSize: "25px",
+              fontWeight: "bold",
+              margin: 0,
+              padding: 0,
+              cursor: "pointer",
+            }}
+            onClick={() => setOptionsVisible(true)}
+          >
+            &#x22EE;
+          </div>
+        </div>
+        <div
+          ref={optionsMenuRef}
+          className="menu_options"
+          style={{
+            display: optionsVisible ? "flex" : "none",
+            position: "absolute",
+            zIndex: 101,
+            flexDirection: "column",
+          }}
+        >
+          {isAutharized() && (
+            <div className="option_element" onClick={requestCapturePhoto}>
+              Capture Photo
+            </div>
+          )}
         </div>
       </div>
 
@@ -246,6 +328,30 @@ export const ChatPage: React.FC = (): JSX.Element => {
                           <span className="message_time">
                             {getDateString(m.createdAt)}
                           </span>
+                        )}
+                        {m.liked && (
+                          <div
+                            style={{
+                              position: "absolute",
+                              bottom: "-15px",
+                              left: "-10px",
+                            }}
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              viewBox="0 0 24 24"
+                              fill="red"
+                              width="24"
+                              height="24"
+                              style={{
+                                background: "#523a86",
+                                padding: "3px",
+                                borderRadius: "50%",
+                              }}
+                            >
+                              <path d="M12 21.35l-1.79-1.61C5.4 15.28 2 12.04 2 8.5 2 5.42 4.42 3 7.5 3c1.88 0 3.63.96 4.5 2.5C12.87 3.96 14.62 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.54-3.4 6.78-8.21 11.24L12 21.35z" />
+                            </svg>
+                          </div>
                         )}
                       </div>
                     </div>
