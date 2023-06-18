@@ -20,7 +20,7 @@ export const AuthPage: React.FC<AuthPageProps> = (props): JSX.Element => {
       const endpoint = window.location.origin + "/auth/login";
       console.log("login", endpoint);
       const creds = { username, password };
-      fetch("https://guftgu.onrender.com/undefined/auth/login", {
+      fetch("https://guftgu.onrender.com/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -60,7 +60,7 @@ export const AuthPage: React.FC<AuthPageProps> = (props): JSX.Element => {
     if (username && password && password.length > 5) {
       const endpoint = window.location.origin + "/auth/register";
       const creds = { username, password };
-      fetch("https://guftgu.onrender.com/undefined/auth/register", {
+      fetch("https://guftgu.onrender.com/auth/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
