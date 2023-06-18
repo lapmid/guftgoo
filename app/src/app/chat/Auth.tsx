@@ -17,7 +17,7 @@ export const AuthPage: React.FC<AuthPageProps> = (props): JSX.Element => {
   const handleLogin = (): void => {
     setProcessing(true);
     if (username && password && password.length > 5) {
-      console.log("login");
+      // console.log("login", AUTH_SERVER);
       const creds = { username, password };
       fetch(AUTH_SERVER + "/auth/login", {
         method: "POST",

@@ -1,8 +1,8 @@
 import { Socket, io } from "socket.io-client";
 
 export const GUFTGOO_ROOMS = "GUFTGOO_ROOMS";
-export const SOCKET_SERVER = process.env.SOCKET_SERVER;
-export const AUTH_SERVER = process.env.AUTH_SERVER;
+export const SOCKET_SERVER = undefined;
+export const AUTH_SERVER = "https://guftgu.onrender.com";
 
 export interface User {
   userId: string;
@@ -35,7 +35,8 @@ export const initSocket = async (
   onCapturePhoto: (user: User) => void
 ): Promise<void> => {
   console.log("socket client connect");
-  socket.current = io();
+  if (process.env.SOCKET_SERVER) socket.current = io(process.env.SOCKET_SERVER);
+  else socket.current = io();
 
   socket.current.on("connected", function () {
     if (socket.current && socket.current.id) {
