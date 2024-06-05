@@ -6,6 +6,7 @@ const bodyParser = require("body-parser");
 const bcrypt = require("bcrypt");
 const passport = require("passport");
 const authRoutes = require("./auth/auth");
+const transferRoutes = require("./transfer/transfer");
 const setupSocketIO = require("./socket");
 
 require("dotenv").config();
@@ -21,6 +22,7 @@ var server = http.createServer(app);
 setupSocketIO(server);
 
 // Middleware
+app.use(cors({ origins: "*" }));
 // app.use(bodyParser.urlencoded({ extended: true }));
 // app.use(bodyParser.json());
 app.use(express.json());
@@ -32,13 +34,13 @@ app.use(
   })
 );
 app.use(express.static(publicPath));
-app.use(cors({ origins: "*" }));
 app.use(passport.initialize());
 app.use(passport.session());
 
 // Routes
 
 app.use("/auth", authRoutes);
+app.use("/transfer", transferRoutes);
 
 app.get("*", (req, res) => {
   res.sendFile(path.join(publicPath, "index.html"));

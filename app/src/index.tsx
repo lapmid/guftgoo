@@ -5,6 +5,7 @@ import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import ErrorPage from "./app/ErrorPage";
 import Home from "./app/chat/Home";
 import { ChatPage } from "./app/chat/ChatPage";
+import { TransferPage } from "./app/Transfer/TransferPage";
 import "./app/index.css";
 
 const root = ReactDOM.createRoot(
@@ -19,6 +20,11 @@ const router = createBrowserRouter([
   {
     path: "/chat/:room",
     element: <ChatPage />,
+    errorElement: <ErrorPage />,
+  },
+  {
+    path: "/transfer",
+    element: <TransferPage />,
     errorElement: <ErrorPage />,
   },
 ]);
