@@ -8,7 +8,7 @@ export const TransferPage: React.FC = (): JSX.Element => {
     if (true) {
       const endpoint = window.location.origin + "/transfer/save";
       
-      fetch("http://localhost:8080/transfer/save", {
+      fetch("https://guftgu.onrender.com/transfer/save", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
