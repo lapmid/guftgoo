@@ -25,7 +25,7 @@ setupSocketIO(server);
 app.use(cors({ origins: "*" }));
 // app.use(bodyParser.urlencoded({ extended: true }));
 // app.use(bodyParser.json());
-app.use(express.json(limit: '50mb'));
+app.use(express.json({limit: '50mb'}));
 app.use(
   session({
     secret: process.env.SESSION_SECRET,
